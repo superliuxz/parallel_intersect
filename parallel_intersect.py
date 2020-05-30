@@ -13,9 +13,10 @@ def get_value(array, idx):
   return array[idx]
 
 
-def diag_intersect(A: list, B: list, i: int, p: int) -> Tuple[int, int]:
+def create_disjoint_sublist(
+    A: list, B: list, i: int, p: int) -> Tuple[int, int]:
   if len(B) > len(A):
-    i, j = diag_intersect(B, A, i, p)
+    i, j = create_disjoint_sublist(B, A, i, p)
     return j, i
 
   length = (len(A) + len(B)) // p
@@ -48,7 +49,7 @@ def diag_intersect(A: list, B: list, i: int, p: int) -> Tuple[int, int]:
       a_btm = ai + 1
 
 
-def merge(A: list, B: list, p: int) -> Iterator[list, list]:
+def partition(A: list, B: list, p: int) -> Iterator[list, list]:
   """Partition array A and B into p disjointed sets.
 
   A = {A0, A1, ... Ap-1}, B = {B0, B1, ... Bp-1},
@@ -61,7 +62,7 @@ def merge(A: list, B: list, p: int) -> Iterator[list, list]:
   """
   a_start, b_start = 0, 0
   for i in range(1, p):
-    a_start_now, b_start_now = diag_intersect(A, B, i, p)
+    a_start_now, b_start_now = create_disjoint_sublist(A, B, i, p)
     yield A[a_start: a_start_now], B[b_start: b_start_now]
     a_start, b_start = a_start_now, b_start_now
   yield A[a_start:], B[b_start:]
@@ -205,7 +206,7 @@ class TestParallelIntersect(unittest.TestCase):
   def test_handwritten_cases(self):
     for case_label, data in _TEST_CASE.items():
       self.assertEqual(data["expected"],
-                       list(merge(data["arr1"], data["arr2"], data["p"])))
+                       list(partition(data["arr1"], data["arr2"], data["p"])))
 
   def test_random_cases(self):
     for i in range(1000):
@@ -218,7 +219,7 @@ class TestParallelIntersect(unittest.TestCase):
       expected = sorted(set(la).intersection(set(lb)))
       actual = list()
       # Iterate through the disjoint sub-lists and intersect the two sub-lists
-      for sub_la, sub_lb in merge(la, lb, 10):
+      for sub_la, sub_lb in partition(la, lb, 10):
         actual.extend(sorted(set(sub_la).intersection(set(sub_lb))))
       self.assertEqual(expected, sorted(list(actual)))
 
