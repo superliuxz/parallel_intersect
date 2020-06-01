@@ -29,7 +29,7 @@ def create_disjoint_sublist(
     a_top = diag
     b_top = 0
   a_btm = b_top
-  while a_top:
+  while True:
     ai = (a_top + a_btm) // 2
     bi = diag - ai
     a_val = get_value(A, ai)
@@ -49,7 +49,7 @@ def create_disjoint_sublist(
       a_btm = ai + 1
 
 
-def partition(A: list, B: list, p: int) -> Iterator[list, list]:
+def partition(A: list, B: list, p: int) -> Iterator[list]:
   """Partition array A and B into p disjointed sets.
 
   A = {A0, A1, ... Ap-1}, B = {B0, B1, ... Bp-1},
